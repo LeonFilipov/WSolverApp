@@ -1,31 +1,40 @@
 import './main.css';
-import { classChanger } from './utils';
-import { callApi } from './validation';
+import { callApi, createWordJson, eventListenerInputs, resetInput } from './utils';
+import { letterValidation } from './validation';
 
+var letterInputId = 6;
+var wordleWordId = 2;
+
+// This function is to create the initial app structure
 document.querySelector('#app').innerHTML = `
   <div class="wordle">
-    <div class="wordle-word">
+    <div id="wordle-word-1" class="wordle-word last">
       <div
+        id="1"
         class="letter-input unselectable unknown"
         data-state="empty"
         readonly
       ></div>
       <div
+        id="2"
         class="letter-input unselectable unknown"
         data-state="empty"
         readonly
       ></div>
       <div
+        id="3"
         class="letter-input unselectable unknown"
         data-state="empty"
         readonly
       ></div>
       <div
+        id="4"
         class="letter-input unselectable unknown"
         data-state="empty"
         readonly
       ></div>
       <div
+        id="5"
         class="letter-input unselectable unknown"
         data-state="empty"
         readonly
@@ -34,28 +43,24 @@ document.querySelector('#app').innerHTML = `
     <div class="animated-div idle" data-state="idle"></div>
     <footer>
       <button id="reset-button" class="button unselectable">Reset</button>
+      <button id="remove-word-button" class="button unselectable"> - </button>
+      <button id="add-word-button" class="button unselectable"> + </button>
       <button id="submit-button" class="button unselectable">Get words</button>
     </footer>
   </div>
 `;
 
+// This event listener is to use the keyboard without clicking on the inputs
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Backspace') {
     const inputElement = document.querySelectorAll('.letter-input[data-state="filled"]');
     if (inputElement.length > 0){
       const element = inputElement[inputElement.length - 1];
-      console.log(inputElement);
-      element.textContent = '';
-      element.dataset.state = 'empty';
-      element.classList.remove('correct');
-      element.classList.remove('perfect');
-      element.classList.remove('absent');
-      element.classList.add('unknown');
+      resetInput(element);
     }
     return;
   }
   if (e.key === 'Enter') {
-    console.log('Enter');
     callApi();
     return;
   }
@@ -68,25 +73,57 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// This event listener is to change the state of the input when it is clicked
 document.querySelectorAll('.letter-input').forEach((inputElement) => {
-  inputElement.addEventListener('click', () => {
-    if (inputElement.dataset.state === 'filled') {
-      classChanger(inputElement);
-    }
-  });
+  eventListenerInputs(inputElement);
 });
 
+// Submit button to call the API
 document.querySelector('#submit-button').addEventListener('click', () => {
-  callApi();
+  if (letterValidation()) {
+    const words = createWordJson();
+    callApi(words);
+  }
+  else {
+    // TODO: Show a message to the user plus animations
+    console.log('Not all letters are filled');
+  }
 });
 
+// The reset button only cleans the inputs
 document.querySelector('#reset-button').addEventListener('click', () => {
   document.querySelectorAll('.letter-input').forEach((inputElement) => {
-    inputElement.textContent = '';
-    inputElement.dataset.state = 'empty';
-    inputElement.classList.remove('correct');
-    inputElement.classList.remove('perfect');
-    inputElement.classList.remove('absent');
-    inputElement.classList.add('unknown');
+    resetInput(inputElement);
   });
+});
+
+// Behavior of the add word button
+document.querySelector('#add-word-button').addEventListener('click', () => {
+  const lastElement = document.querySelector('.last');
+  lastElement.classList.remove('last');
+  const newElement = lastElement.cloneNode(true);
+  newElement.id = `wordle-word-${wordleWordId}`;
+  wordleWordId += 1;
+  newElement.classList.add('last');
+
+  // Add event listener and id to the new inputs
+  newElement.querySelectorAll('.letter-input').forEach((inputElement) => {
+    eventListenerInputs(inputElement);
+    inputElement.id = letterInputId;
+    letterInputId += 1;
+    resetInput(inputElement);
+  });
+  document.querySelector('.wordle').insertBefore(newElement, document.querySelector('.animated-div'));
+});
+
+// Behavior of the remove word button
+document.querySelector('#remove-word-button').addEventListener('click', () => {
+  const lastElement = document.querySelector('.last');
+  if (lastElement.id !== 'wordle-word-1') { // The first word can't be removed
+    lastElement.classList.remove('last');
+    lastElement.previousElementSibling.classList.add('last');
+    lastElement.remove();
+    letterInputId -= 5;
+    wordleWordId -= 1;
+  }
 });
