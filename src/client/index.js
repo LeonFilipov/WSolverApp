@@ -99,21 +99,27 @@ document.querySelector('#reset-button').addEventListener('click', () => {
 
 // Behavior of the add word button
 document.querySelector('#add-word-button').addEventListener('click', () => {
-  const lastElement = document.querySelector('.last');
-  lastElement.classList.remove('last');
-  const newElement = lastElement.cloneNode(true);
-  newElement.id = `wordle-word-${wordleWordId}`;
-  wordleWordId += 1;
-  newElement.classList.add('last');
+  if (wordleWordId <= 4) {
+    const lastElement = document.querySelector('.last');
+    lastElement.classList.remove('last');
+    const newElement = lastElement.cloneNode(true);
+    newElement.id = `wordle-word-${wordleWordId}`;
+    wordleWordId += 1;
+    newElement.classList.add('last');
 
-  // Add event listener and id to the new inputs
-  newElement.querySelectorAll('.letter-input').forEach((inputElement) => {
-    eventListenerInputs(inputElement);
-    inputElement.id = letterInputId;
-    letterInputId += 1;
-    resetInput(inputElement);
-  });
-  document.querySelector('.wordle').insertBefore(newElement, document.querySelector('.animated-div'));
+    // Add event listener and id to the new inputs
+    newElement.querySelectorAll('.letter-input').forEach((inputElement) => {
+      eventListenerInputs(inputElement);
+      inputElement.id = letterInputId;
+      letterInputId += 1;
+      resetInput(inputElement);
+    });
+    document.querySelector('.wordle').insertBefore(newElement, document.querySelector('.animated-div'));
+  }
+  else {
+    // TODO: pop-up message to the user
+    console.log('Only 4 words are allowed');
+  }
 });
 
 // Behavior of the remove word button
