@@ -42,20 +42,48 @@ export function createWordJson() {
   const perfect = [];
   const correct = [];
   const absent = [];
-  document.querySelectorAll('.letter-input').forEach((inputElement, index) => {
-    if (inputElement.textContent !== '') {
-      if (inputElement.classList.contains('perfect')) {
+  document.querySelectorAll('.letter-input').forEach((inputElement) => {
+    let usedLetter = false;
+    if (inputElement.classList.contains('perfect')) {
+      for (const p of perfect) {
+        if (p.letter === inputElement.textContent && p.position === inputElement.id % 5) {
+          usedLetter = true;
+          break;
+        }
+      }
+      if (!usedLetter) {
         perfect.push({
           letter: inputElement.textContent,
-          position: index + 1
+          position: inputElement.id % 5 === 0 ? 5 : inputElement.id % 5
         });
-      } else if (inputElement.classList.contains('correct')) {
+      }
+    }
+    else if (inputElement.classList.contains('correct')) {
+      // I dont want to repeat the same letter in the same position
+      for (const c of correct) {
+        if (c.letter === inputElement.textContent && c.position === inputElement.id % 5) {
+          usedLetter = true;
+          break;
+        }
+      }
+      if (!usedLetter) {
         correct.push({
           letter: inputElement.textContent,
-          position: index + 1
+          position: inputElement.id % 5 === 0 ? 5 : inputElement.id % 5
         });
-      } else if (inputElement.classList.contains('absent')) {
-        absent.push(inputElement.textContent);
+      }
+    }
+    else { // If it is absent cant be repeated or perfect or correct
+      const inputLetter = inputElement.textContent;
+      usedLetter = auxLetterIteration(inputLetter, absent);
+      if (!usedLetter) {
+        usedLetter = auxLetterIteration(inputLetter, perfect);
+        if (!usedLetter) {
+          usedLetter = auxLetterIteration(inputLetter, correct);
+          if (!usedLetter) {
+            absent.push({ letter: inputLetter});
+          }
+        }
       }
     }
   });
@@ -66,21 +94,32 @@ export function createWordJson() {
   };
 };
 
+function auxLetterIteration(inputElementLetter, object) {
+  for (const p of object) {
+    if (p.letter == inputElementLetter) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export async function callApi(words) {
-  const response = await fetch('/api', {
+  await fetch('/api', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ words })
+    body: JSON.stringify(words)
+  }).then(response => {
+    if (response.ok) {
+      return response.json();
+    }
+    else {
+      throw new Error('Something went wrong');
+    }
+  }).then(data => {
+    console.log(data);
+  }).catch(error => {
+    console.error(error)
   });
-
-  const data = await response.json();
-  console.log(data); // Control
-  if (data.words.length === 0) {
-    console.log('No words found');
-  }
-  for (const word of data.words) {
-    console.log(word); // Control
-  }
 };

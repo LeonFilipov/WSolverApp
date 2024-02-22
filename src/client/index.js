@@ -82,7 +82,7 @@ document.querySelectorAll('.letter-input').forEach((inputElement) => {
 document.querySelector('#submit-button').addEventListener('click', () => {
   if (letterValidation()) {
     const words = createWordJson();
-    callApi(words);
+    callApi(words);    
   }
   else {
     // TODO: Show a message to the user plus animations

@@ -3,24 +3,23 @@ import { fileURLToPath } from "url";
 import path from "path";
 import ViteExpress from "vite-express";
 import sqlite3 from "sqlite3";
+import bodyParser from "body-parser";
 
 // Create a new database
 const db = new sqlite3.Database("WordleSolver.db");
-const base = "SELECT * FROM words WHERE ";
+const base = "SELECT * FROM Words5 WHERE ";
 
 // Query creation
 const createQuery = (wordJson) => {
   let query = '';
-  for (let word of wordJson.words){
-    for (let p of word.perfect) {
-      query += `SUBSTR(word, ${p.position}, 1) = '${p.letter}' AND `;
-    }
-    for (let c of word.correct) {
-      query += `NOT SUBSTR(word, ${c.position}, 1) = '${c.letter}' AND word LIKE '%${c.letter}%' AND `;
-    }
-    for (let a of word.absent) {
-      query += `NOT word LIKE '%${a}%' AND `;
-    }
+  for (let p of wordJson.perfect) {
+    query += `SUBSTR(word, ${p.position}, 1) = '${p.letter}' AND `;
+  }
+  for (let c of wordJson.correct) {
+    query += `NOT SUBSTR(word, ${c.position}, 1) = '${c.letter}' AND word LIKE '%${c.letter}%' AND `;
+  }
+  for (let a of wordJson.absent) {
+    query += `NOT word LIKE '%${a}%' AND `;
   }
   query = query.slice(0, -5);
   return query + ";";
@@ -33,16 +32,19 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 app.use(express.static(path.join(__dirname, 'dist')));
-
+app.use(bodyParser.json());
 // API
 app.post("/api", (req, res) => {
-  const words = req.body.words; // Recive a JSON with the words
+  const words = req.body; // Recive a JSON with the words
+  console.log("words in back " + req.body.perfect); // Control
   let query = base;
   query += createQuery(words);
+  console.log(query); // Control
   db.all(query, (err, rows) => {
     if (err) {
       console.error(err.message);
     }
+    console.log(rows)
     res.json({ words: rows });
   });
 });
