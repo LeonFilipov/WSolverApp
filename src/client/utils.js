@@ -119,7 +119,53 @@ export async function callApi(words) {
     }
   }).then(data => {
     console.log(data);
+    showResponses(data);
   }).catch(error => {
     console.error(error)
   });
 };
+
+export function showResponses(response) {
+  let htmlDisplay = '';
+  for (const word of response.words) {
+    htmlDisplay += `<button class="button-display">${word.word}</button>`;
+  }
+  document.querySelector('.word-display').innerHTML = htmlDisplay;
+  document.querySelectorAll('.button-display').forEach((button) => {
+    button.addEventListener('click', () => {
+      addWord(button.textContent);
+    });
+  });
+};
+
+export function addWord(textContent = '') {
+  const lastElement = document.querySelector('.last');
+  const wordleWordId = parseInt(lastElement.id.at(-1));
+  if (wordleWordId === 5) {
+    // TODO: Show a message to the user plus animations
+    return Error('You can only have 5 words');
+  }
+
+  lastElement.classList.remove('last');
+  const newElement = lastElement.cloneNode(true);
+  newElement.id = `wordle-word-${wordleWordId + 1}`;
+  newElement.classList.add('last');
+  // Add event listener and id to the new inputs
+  let letterInputId = wordleWordId * 5 + 1;
+  newElement.querySelectorAll('.letter-input').forEach((inputElement) => {
+    eventListenerInputs(inputElement);
+    inputElement.id = letterInputId;
+    resetInput(inputElement);
+    if (textContent !== '') {
+      if (letterInputId % 5 === 0) {
+        inputElement.textContent = textContent[4];
+      }
+      else {
+        inputElement.textContent = textContent[letterInputId % 5 - 1];
+      }
+      inputElement.dataset.state = 'filled';
+    }
+    letterInputId++;
+  });
+  document.querySelector('.wordle').insertBefore(newElement, document.querySelector('.animated-div'));
+}

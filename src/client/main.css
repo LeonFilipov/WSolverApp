@@ -21,6 +21,14 @@
     -webkit-font-smoothing: antialiased;
 }
 
+#app {
+    display: flex;
+}
+
+.column {
+    flex: 1;
+}
+
 .title {
     margin: 1em 0 1em 0;
     display: flex;
@@ -33,8 +41,11 @@
 }
 
 .wordle {
-    display: grid;
     justify-items: center;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
 }
 
 .wordle-word {
@@ -43,6 +54,36 @@
     margin-top: 1em;
     margin-bottom: 1em;
 }
+
+.animated-div {
+    background-color: #b994f0d0;
+    width: .75em;
+    height: .75em;
+    border-radius: 50%;
+    box-shadow: 0 0 .5em #fff,
+        0 0 .3em var(--minsk-50),
+        0 0 .5em var(--minsk-200),
+        0 0 .7em var(--minsk-900),
+        0 0 1.5em #9346f1,
+        0 0 1.5em #9844ff,
+        0 0 1.5em #9346f1;
+}
+
+.idle {
+    animation: idle-anim 1.5s infinite alternate;
+    animation-timing-function: ease-in-out;
+}
+
+.word-display { 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 4em;
+    gap: 1em;
+}
+
+/* Letters */
 
 .letter-input {
     display: flex;
@@ -66,46 +107,6 @@
 
 .letter-input[data-state="filled"]:hover {
     animation: scale-anim 1s infinite alternate;
-}
-
-@keyframes inverter-anim {
-    100% {
-        border: 2px solid #3d3a3a;
-    }
-    
-}
-
-@keyframes scale-anim {
-    100% {
-        scale: 105%;
-    }
-}
-
-.animated-div {
-    background-color: #b994f0d0;
-    width: .75em;
-    height: .75em;
-    border-radius: 50%;
-    box-shadow: 0 0 .5em #fff,
-        0 0 .3em var(--minsk-50),
-        0 0 .5em var(--minsk-200),
-        0 0 .7em var(--minsk-900),
-        0 0 1.5em #9346f1,
-        0 0 1.5em #9844ff,
-        0 0 1.5em #9346f1;
-}
-
-.idle {
-    animation: idle-anim 1.5s infinite alternate;
-    animation-timing-function: ease-in-out;
-}
-@keyframes idle-anim {
-    0% {
-        transform: translate(.4em, 0);
-    }
-    100%{
-        transform: translate(-.4em, 0);
-    }
 }
 
 .unknown {
@@ -137,6 +138,8 @@
     user-select: none;
 }
 
+/* Buttons */
+
 .button {
     width: 7em;
     height: 2em;
@@ -159,4 +162,32 @@
 
 #add-word-button, #remove-word-button    {
     width: 2.3em;
+}
+
+.button-display {
+    width: 7em;
+    height: 2em;
+    font-size: 17px;
+}
+
+@keyframes inverter-anim {
+    100% {
+        border: 2px solid #3d3a3a;
+    }
+    
+}
+
+@keyframes scale-anim {
+    100% {
+        scale: 105%;
+    }
+}
+
+@keyframes idle-anim {
+    0% {
+        transform: translate(.4em, 0);
+    }
+    100%{
+        transform: translate(-.4em, 0);
+    }
 }

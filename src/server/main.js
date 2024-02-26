@@ -19,10 +19,11 @@ const createQuery = (wordJson) => {
     query += `NOT SUBSTR(word, ${c.position}, 1) = '${c.letter}' AND word LIKE '%${c.letter}%' AND `;
   }
   for (let a of wordJson.absent) {
-    query += `NOT word LIKE '%${a}%' AND `;
+    query += `NOT word LIKE '%${a.letter}%' AND `;
   }
-  query = query.slice(0, -5);
-  return query + ";";
+  query = query.slice(0, -4);
+  query += "LIMIT 10;";
+  return query;
 };
 
 // Static file serving
@@ -39,7 +40,6 @@ app.post("/api", (req, res) => {
   console.log("words in back " + req.body.perfect); // Control
   let query = base;
   query += createQuery(words);
-  console.log(query); // Control
   db.all(query, (err, rows) => {
     if (err) {
       console.error(err.message);

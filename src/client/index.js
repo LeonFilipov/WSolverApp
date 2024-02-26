@@ -1,13 +1,15 @@
 import './main.css';
-import { callApi, createWordJson, eventListenerInputs, resetInput } from './utils';
+import { callApi, createWordJson, eventListenerInputs, resetInput, addWord} from './utils';
 import { letterValidation } from './validation';
-
-var letterInputId = 6;
-var wordleWordId = 2;
 
 // This function is to create the initial app structure
 document.querySelector('#app').innerHTML = `
-  <div class="wordle">
+  <div class="column">
+  </div>
+  <div class="wordle column">
+    <header>
+      <h1 class="title">Wordle Solver</h1>
+    </header>
     <div id="wordle-word-1" class="wordle-word last">
       <div
         id="1"
@@ -48,6 +50,10 @@ document.querySelector('#app').innerHTML = `
       <button id="submit-button" class="button unselectable">Get words</button>
     </footer>
   </div>
+  <div class="column">
+    <div class="word-display">
+    </div>
+  </div>
 `;
 
 // This event listener is to use the keyboard without clicking on the inputs
@@ -61,7 +67,7 @@ document.addEventListener('keydown', (e) => {
     return;
   }
   if (e.key === 'Enter') {
-    callApi();
+    response = callApi();
     return;
   }
   if (/^[a-zA-Z]$/.test(e.key)) {
@@ -79,10 +85,10 @@ document.querySelectorAll('.letter-input').forEach((inputElement) => {
 });
 
 // Submit button to call the API
-document.querySelector('#submit-button').addEventListener('click', () => {
+document.querySelector('#submit-button').addEventListener('click', async () => {
   if (letterValidation()) {
     const words = createWordJson();
-    callApi(words);    
+    callApi(words);
   }
   else {
     // TODO: Show a message to the user plus animations
@@ -92,34 +98,25 @@ document.querySelector('#submit-button').addEventListener('click', () => {
 
 // The reset button only cleans the inputs
 document.querySelector('#reset-button').addEventListener('click', () => {
-  document.querySelectorAll('.letter-input').forEach((inputElement) => {
-    resetInput(inputElement);
+  document.querySelectorAll('.wordle-word').forEach((word) => {
+    if (word.id !== 'wordle-word-1') {
+      word.remove();
+    }
+    else {
+      word.classList.add('last');
+      word.querySelectorAll('.letter-input').forEach((inputElement) => {
+        resetInput(inputElement);
+      });
+    }
+  });
+  document.querySelectorAll('.button-display').forEach((button) => {
+    button.remove();
   });
 });
 
 // Behavior of the add word button
 document.querySelector('#add-word-button').addEventListener('click', () => {
-  if (wordleWordId <= 4) {
-    const lastElement = document.querySelector('.last');
-    lastElement.classList.remove('last');
-    const newElement = lastElement.cloneNode(true);
-    newElement.id = `wordle-word-${wordleWordId}`;
-    wordleWordId += 1;
-    newElement.classList.add('last');
-
-    // Add event listener and id to the new inputs
-    newElement.querySelectorAll('.letter-input').forEach((inputElement) => {
-      eventListenerInputs(inputElement);
-      inputElement.id = letterInputId;
-      letterInputId += 1;
-      resetInput(inputElement);
-    });
-    document.querySelector('.wordle').insertBefore(newElement, document.querySelector('.animated-div'));
-  }
-  else {
-    // TODO: pop-up message to the user
-    console.log('Only 4 words are allowed');
-  }
+  addWord();
 });
 
 // Behavior of the remove word button
@@ -129,7 +126,5 @@ document.querySelector('#remove-word-button').addEventListener('click', () => {
     lastElement.classList.remove('last');
     lastElement.previousElementSibling.classList.add('last');
     lastElement.remove();
-    letterInputId -= 5;
-    wordleWordId -= 1;
   }
 });
