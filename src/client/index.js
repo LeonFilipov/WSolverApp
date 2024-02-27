@@ -67,7 +67,7 @@ document.addEventListener('keydown', (e) => {
     return;
   }
   if (e.key === 'Enter') {
-    response = callApi();
+    callApi(createWordJson());
     return;
   }
   if (/^[a-zA-Z]$/.test(e.key)) {
@@ -87,8 +87,7 @@ document.querySelectorAll('.letter-input').forEach((inputElement) => {
 // Submit button to call the API
 document.querySelector('#submit-button').addEventListener('click', async () => {
   if (letterValidation()) {
-    const words = createWordJson();
-    callApi(words);
+    callApi(createWordJson());
   }
   else {
     // TODO: Show a message to the user plus animations

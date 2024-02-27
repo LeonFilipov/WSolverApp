@@ -42,59 +42,78 @@ export function createWordJson() {
   const perfect = [];
   const correct = [];
   const absent = [];
-  document.querySelectorAll('.letter-input').forEach((inputElement) => {
-    let usedLetter = false;
-    if (inputElement.classList.contains('perfect')) {
-      for (const p of perfect) {
-        if (p.letter === inputElement.textContent && p.position === inputElement.id % 5) {
-          usedLetter = true;
-          break;
-        }
-      }
-      if (!usedLetter) {
-        perfect.push({
-          letter: inputElement.textContent,
-          position: inputElement.id % 5 === 0 ? 5 : inputElement.id % 5
-        });
-      }
-    }
-    else if (inputElement.classList.contains('correct')) {
-      // I dont want to repeat the same letter in the same position
-      for (const c of correct) {
-        if (c.letter === inputElement.textContent && c.position === inputElement.id % 5) {
-          usedLetter = true;
-          break;
-        }
-      }
-      if (!usedLetter) {
-        correct.push({
-          letter: inputElement.textContent,
-          position: inputElement.id % 5 === 0 ? 5 : inputElement.id % 5
-        });
-      }
-    }
-    else { // If it is absent cant be repeated or perfect or correct
-      const inputLetter = inputElement.textContent;
-      usedLetter = auxLetterIteration(inputLetter, absent);
-      if (!usedLetter) {
-        usedLetter = auxLetterIteration(inputLetter, perfect);
-        if (!usedLetter) {
-          usedLetter = auxLetterIteration(inputLetter, correct);
-          if (!usedLetter) {
-            absent.push({ letter: inputLetter});
+  // Quiero trabajar con las palabras en si no con cada letra.
+  document.querySelectorAll('.wordle-word').forEach((inputElement) => {
+      inputElement.querySelectorAll('.letter-input').forEach((letter) => {
+          let letterPosition = letter.id % 5;
+          const letterText = letter.textContent;
+          let used = false;
+          if (letterPosition === 0) {
+              letterPosition = 5;
           }
-        }
-      }
-    }
+          if (letter.classList.contains('perfect')) {
+              for (const pLetter of perfect) {
+                  if (pLetter.letter === letterText && pLetter.position === letterPosition) {
+                      used = true;
+                      break;
+                  }
+              }
+              if (!used) {
+                  perfect.push({
+                      letter: letterText,
+                      position: letterPosition
+                  })
+              }
+          }
+          else if (letter.classList.contains('correct')) {
+              for (const cLetter of correct) {
+                  if (cLetter.letter === letterText && cLetter.position === letterPosition) {
+                      used = true;
+                      break;
+                  }
+              }
+              if (!used) {
+                  correct.push({
+                      letter: letterText,
+                      position: letterPosition
+                  })
+              }
+          }
+          else { // Absent
+              for (const aLetter of absent) {
+                  if (aLetter.letter === letterText){
+                      if (aLetter.position.length !== 0 && !aLetter.position.includes(letterPosition)) {
+                          aLetter.position.push(letterPosition);
+                      }
+                      used = true;
+                      break
+                  }
+              }
+              if (!used) { // No se utilizo antes.
+                  if (letterInObject(letterText, perfect) || letterInObject(letterText, correct)) {
+                      absent.push({
+                          letter: letterText,
+                          position: [letterPosition]
+                      }) // First push of the letter.
+                  }
+                  else {
+                      absent.push({
+                          letter: letterText,
+                          position: []
+                      })
+                  }
+              }
+          }
+      });
   });
   return {
-    perfect,
-    correct,
-    absent
+      perfect,
+      correct,
+      absent
   };
 };
 
-function auxLetterIteration(inputElementLetter, object) {
+function letterInObject(inputElementLetter, object) {
   for (const p of object) {
     if (p.letter == inputElementLetter) {
       return true;
