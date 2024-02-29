@@ -12,18 +12,32 @@ const base = "SELECT * FROM Words5 WHERE ";
 // Query creation
 const createQuery = (wordJson) => {
   let query = '';
+  const vocals = ['a', 'e', 'i', 'o', 'u'];
+  const vocalsWithAccent = ['á', 'é', 'í', 'ó', 'ú'];
   for (let p of wordJson.perfect) {
+    if (vocals.includes(p.letter)) {
+      query += `SUBSTR(word, ${p.position}, 1) = '${vocalsWithAccent[vocals.indexOf(p.letter)]}' AND `;
+    }
     query += `SUBSTR(word, ${p.position}, 1) = '${p.letter}' AND `;
   }
   for (let c of wordJson.correct) {
+    if (vocals.includes(c.letter)) {
+      query += `NOT SUBSTR(word, ${c.position}, 1) = '${vocalsWithAccent[vocals.indexOf(c.letter)]}' AND word LIKE '%${vocalsWithAccent[vocals.indexOf(c.letter)]}%' AND `;
+    }
     query += `NOT SUBSTR(word, ${c.position}, 1) = '${c.letter}' AND word LIKE '%${c.letter}%' AND `;
   }
   for (let a of wordJson.absent) {
     if (a.position.length === 0) {
+      if (vocals.includes(a.letter)) {
+        query += `NOT word LIKE '%${vocalsWithAccent[vocals.indexOf(a.letter)]}%' AND `;
+      }
       query += `NOT word LIKE '%${a.letter}%' AND `;
     }
     else {
       for (let pos of a.position) {
+        if (vocals.includes(a.letter)) {
+          query += `NOT SUBSTR(word, ${pos}, 1) = '${vocalsWithAccent[vocals.indexOf(a.letter)]}' AND `;
+        }
         query += `NOT SUBSTR(word, ${pos}, 1) = '${a.letter}' AND `;
       }
     }
