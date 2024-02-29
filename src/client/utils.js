@@ -145,11 +145,20 @@ export async function callApi(words) {
 };
 
 export function showResponses(response) {
-  let htmlDisplay = '';
+  let htmlColumn1 = '';
+  let htmlColumn2 = '';
+  let col = true; // Column number
   for (const word of response.words) {
-    htmlDisplay += `<button class="button-display">${word.word}</button>`;
+    if (col){
+      htmlColumn1 += `<button class="button-display button">${word.word}</button>`;
+    }
+    else {
+      htmlColumn2 += `<button class="button-display button">${word.word}</button>`;
+    }
+    col = !col;
   }
-  document.querySelector('.word-display').innerHTML = htmlDisplay;
+  document.querySelector('#col-1').innerHTML = htmlColumn1;
+  document.querySelector('#col-2').innerHTML = htmlColumn2; 
   document.querySelectorAll('.button-display').forEach((button) => {
     button.addEventListener('click', () => {
       addWord(button.textContent);

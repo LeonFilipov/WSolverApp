@@ -4,8 +4,6 @@ import { letterValidation } from './validation';
 
 // This function is to create the initial app structure
 document.querySelector('#app').innerHTML = `
-  <div class="column">
-  </div>
   <div class="wordle column">
     <header>
       <h1 class="title">Wordle Solver</h1>
@@ -43,15 +41,15 @@ document.querySelector('#app').innerHTML = `
       ></div>
     </div>
     <div class="animated-div idle" data-state="idle"></div>
-    <footer>
+    <div class="buttons-nav">
       <button id="reset-button" class="button unselectable">Reset</button>
       <button id="remove-word-button" class="button unselectable"> - </button>
       <button id="add-word-button" class="button unselectable"> + </button>
       <button id="submit-button" class="button unselectable">Get words</button>
-    </footer>
-  </div>
-  <div class="column">
+    </div>
     <div class="word-display">
+      <div class="column" id="col-1"></div>
+      <div class="column" id="col-2"></div>
     </div>
   </div>
 `;
