@@ -1,5 +1,8 @@
-// Change the class of the input element to the next state.
-export function classChanger(inputElement) {
+/**
+ * 
+ * @param {HTMLInputElement} inputElement change the class of the element
+ */
+export function classChanger(inputElement: HTMLInputElement) {
   if (inputElement.classList.contains('correct')) {
     inputElement.classList.remove('correct');
     inputElement.classList.add('absent');
@@ -18,8 +21,11 @@ export function classChanger(inputElement) {
   }
 };
 
-// This function is to reset the input.
-export function resetInput(inputElement) {
+/**
+ * 
+ * @param {HTMLInputElement} inputElement reset the class to unknown
+ */
+export function resetInput(inputElement: HTMLInputElement) {
   inputElement.textContent = '';
   inputElement.dataset.state = 'empty';
   inputElement.classList.remove('correct');
@@ -28,8 +34,11 @@ export function resetInput(inputElement) {
   inputElement.classList.add('unknown');
 };
 
-// This function is to change the state of the input when it is clicked
-export function eventListenerInputs(inputElement) {
+/**
+ * When you click the element, change the class
+ * @param {HTMLInputElement} inputElement 
+ */
+export function eventListenerInputs(inputElement: HTMLInputElement) {
   inputElement.addEventListener('click', () => {
     if (inputElement.dataset.state === 'filled') {
       classChanger(inputElement);
@@ -37,51 +46,53 @@ export function eventListenerInputs(inputElement) {
   });
 };
 
-// This function is to create an object with the inputs to send to the server
-export function createWordJson() {
+/**
+ * 
+ * @returns {object} With fields {perfect, correct, absent}
+ */
+export function createWordObject() {
   const perfect = [];
   const correct = [];
   const absent = [];
-  // Quiero trabajar con las palabras en si no con cada letra.
   document.querySelectorAll('.wordle-word').forEach((inputElement) => {
-      inputElement.querySelectorAll('.letter-input').forEach((letter) => {
-          let letterPosition = letter.id % 5;
-          const letterText = letter.textContent;
+      inputElement.querySelectorAll('.letter-input').forEach((inputLetter) => {
+          let letterPosition = inputLetter.id % 5;
+          const letter = inputLetter.textContent;
           let used = false;
           if (letterPosition === 0) {
               letterPosition = 5;
           }
-          if (letter.classList.contains('perfect')) {
+          if (inputLetter.classList.contains('perfect')) {
               for (const pLetter of perfect) {
-                  if (pLetter.letter === letterText && pLetter.position === letterPosition) {
+                  if (pLetter.letter === letter && pLetter.position === letterPosition) {
                       used = true;
                       break;
                   }
               }
               if (!used) {
                   perfect.push({
-                      letter: letterText,
+                      letter: letter,
                       position: letterPosition
                   })
               }
           }
-          else if (letter.classList.contains('correct')) {
+          else if (inputLetter.classList.contains('correct')) {
               for (const cLetter of correct) {
-                  if (cLetter.letter === letterText && cLetter.position === letterPosition) {
+                  if (cLetter.letter === letter && cLetter.position === letterPosition) {
                       used = true;
                       break;
                   }
               }
               if (!used) {
                   correct.push({
-                      letter: letterText,
+                      letter: letter,
                       position: letterPosition
                   })
               }
           }
           else { // Absent
               for (const aLetter of absent) {
-                  if (aLetter.letter === letterText){
+                  if (aLetter.letter === letter){
                       if (aLetter.position.length !== 0 && !aLetter.position.includes(letterPosition)) {
                           aLetter.position.push(letterPosition);
                       }
@@ -90,15 +101,15 @@ export function createWordJson() {
                   }
               }
               if (!used) { // No se utilizo antes.
-                  if (letterInObject(letterText, perfect) || letterInObject(letterText, correct)) {
+                  if (letterInObject(letter, perfect) || letterInObject(letter, correct)) {
                       absent.push({
-                          letter: letterText,
+                          letter: letter,
                           position: [letterPosition]
                       }) // First push of the letter.
                   }
                   else {
                       absent.push({
-                          letter: letterText,
+                          letter: letter,
                           position: []
                       })
                   }
@@ -122,7 +133,7 @@ function letterInObject(inputElementLetter, object) {
   return false;
 }
 
-export async function callApi(words) {
+export async function submitWords(words) {
   await fetch('/api', {
     method: 'POST',
     headers: {

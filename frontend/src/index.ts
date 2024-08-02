@@ -1,60 +1,8 @@
-import './main.css';
-import { callApi, createWordJson, eventListenerInputs, resetInput, addWord} from './utils';
+import '../public/main.css';
+import { submitWords, createWordObject, eventListenerInputs, resetInput, addWord} from './utils';
 import { letterValidation } from './validation';
 
-// This function is to create the initial app structure
-document.querySelector('#app').innerHTML = `
-  <div class="wordle column">
-    <header>
-      <h1 class="title">Wordle Solver</h1>
-    </header>
-    <div id="wordle-word-1" class="wordle-word last">
-      <div
-        id="1"
-        class="letter-input unselectable unknown"
-        data-state="empty"
-        readonly
-      ></div>
-      <div
-        id="2"
-        class="letter-input unselectable unknown"
-        data-state="empty"
-        readonly
-      ></div>
-      <div
-        id="3"
-        class="letter-input unselectable unknown"
-        data-state="empty"
-        readonly
-      ></div>
-      <div
-        id="4"
-        class="letter-input unselectable unknown"
-        data-state="empty"
-        readonly
-      ></div>
-      <div
-        id="5"
-        class="letter-input unselectable unknown"
-        data-state="empty"
-        readonly
-      ></div>
-    </div>
-    <div class="animated-div idle" data-state="idle"></div>
-    <div class="buttons-nav">
-      <button id="reset-button" class="button unselectable">Reset</button>
-      <button id="remove-word-button" class="button unselectable"> - </button>
-      <button id="add-word-button" class="button unselectable"> + </button>
-      <button id="submit-button" class="button unselectable">Get words</button>
-    </div>
-    <div class="word-display">
-      <div class="column" id="col-1"></div>
-      <div class="column" id="col-2"></div>
-    </div>
-  </div>
-`;
-
-// This event listener is to use the keyboard without clicking on the inputs
+// Event listener to use the keyboard without select the field
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Backspace') {
     const inputElement = document.querySelectorAll('.letter-input[data-state="filled"]');
@@ -65,7 +13,7 @@ document.addEventListener('keydown', (e) => {
     return;
   }
   if (e.key === 'Enter') {
-    callApi(createWordJson());
+    submitWords(createWordObject());
     return;
   }
   if (/^[a-zA-Z]$/.test(e.key)) {
@@ -77,7 +25,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// This event listener is to change the state of the input when it is clicked
+// Event listener is to change the state of the input when it is clicked
 document.querySelectorAll('.letter-input').forEach((inputElement) => {
   eventListenerInputs(inputElement);
 });
@@ -85,12 +33,10 @@ document.querySelectorAll('.letter-input').forEach((inputElement) => {
 // Submit button to call the API
 document.querySelector('#submit-button').addEventListener('click', async () => {
   if (letterValidation()) {
-    callApi(createWordJson());
+    submitWords(createWordObject());
   }
-  else {
-    // TODO: Show a message to the user plus animations
-    console.log('Not all letters are filled');
-  }
+  // TODO: Show a message to the user plus animations
+  console.log('Not all letters are filled');
 });
 
 // The reset button only cleans the inputs
