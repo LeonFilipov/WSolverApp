@@ -1,37 +1,46 @@
 import express from 'express';
-// import { fileURLToPath } from "url"
-// import path from "path"
 import sqlite3 from "sqlite3";
 import bodyParser from "body-parser";
-import { BASE_QUERY, LOCALDB } from "./constants/const.js";
+import { ACCEPTED_ORIGINS, LOCAL_DB } from "./constants/const.js";
 import { createQuery } from "./dataBaseQuery.js";
+import { lettersSchema } from './validation/lettes.js';
+import cors from 'cors';
 // Create a new database
-const db = new sqlite3.Database(LOCALDB);
-// Static file serving
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
+const db = new sqlite3.Database(LOCAL_DB);
 const app = express();
-// Middleware
+// Middlewares
 app.use(bodyParser.json());
-app.post("/api", (req, res) => {
-    const words = req.body; // Recive a JSON with the words
-    let query = BASE_QUERY;
-    query += createQuery(words);
-    console.log(query);
-    db.all(query, (err, rows) => {
-        if (err) {
-            console.error(err.message);
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin) {
+            return callback(null, true);
         }
-        console.log(rows);
-        res.json({ words: rows });
-    });
+        if (ACCEPTED_ORIGINS.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error('Not accepted CORS'));
+    }
+}));
+// API
+app.post("/api", (req, res) => {
+    const parsedJSON = lettersSchema.safeParse(req.body); // Recive a JSON with the words
+    if (parsedJSON.success) {
+        const letters = parsedJSON.data;
+        const query = createQuery(letters);
+        db.all(query, (err, rows) => {
+            if (err) {
+                return res.status(500).json({ message: 'Internal server error' }); // Error 500 -> internal server error
+            }
+            res.json({ words: rows });
+        });
+    }
+    else {
+        return res.status(400).json({ message: 'Bad validation' }); // Error 400 -> bad request
+    }
 });
-app.get("/api", (_req, res) => {
-    res.send("No get requests allowed :)");
-});
-// ViteExpress.listen(app, 3000, () =>
-//   console.log("Server is listening on port 3000...")
-// );
+// app.get("/api", (_req, res) => {
+//     res.send("No get requests allowed :)");
+// });
 app.listen(3000, () => {
     console.log("Server is listening on port 3000");
 });

@@ -1,4 +1,4 @@
-
+// Types
 export type Letter = {
     letter: string;
     position: number;

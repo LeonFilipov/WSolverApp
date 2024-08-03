@@ -1,23 +1,53 @@
-// Query creation
-export const createQuery = (wordJson) => {
-    let query = '';
-    for (let p of wordJson.perfect) {
-        query += `SUBSTR(word, ${p.position}, 1) = '${p.letter}' AND `;
+import { BASE_QUERY } from './constants/const.js';
+const QUERY_END = 'ORDER BY RANDOM() LIMIT 10;';
+/**
+ *
+ * @param letter
+ * @returns string - with the subquery
+ */
+const perfectLetterQ = (letter) => {
+    return `SUBSTR(word, ${letter.position}, 1) = '${letter.letter}' AND `;
+};
+/**
+ *
+ * @param letter
+ * @returns string - with the substring
+ */
+const correctLetterQ = (letter) => {
+    return `NOT SUBSTR(word, ${letter.position}, 1) = '${letter.letter}' AND word LIKE '%${letter.letter}%' AND `;
+};
+/**
+ *
+ * @param letter - the absent letters to create the query
+ * @returns string - correspondent subquery to filter the absent letters
+ */
+const absentLetterQ = (letter) => {
+    if (letter.position.length === 0) {
+        return `NOT word LIKE '%${letter.letter}%' AND `;
     }
-    for (let c of wordJson.correct) {
-        query += `NOT SUBSTR(word, ${c.position}, 1) = '${c.letter}' AND word LIKE '%${c.letter}%' AND `;
+    let res = '';
+    for (let pos of letter.position) {
+        res += `NOT SUBSTR(word, ${pos}, 1) = '${letter.letter}' AND `;
     }
-    for (let a of wordJson.absent) {
-        if (a.position.length === 0) {
-            query += `NOT word LIKE '%${a.letter}%' AND `;
-        }
-        else {
-            for (let pos of a.position) {
-                query += `NOT SUBSTR(word, ${pos}, 1) = '${a.letter}' AND `;
-            }
-        }
+    return res;
+};
+/**
+ *
+ * @param letters - all the letters to create the query
+ * @returns string -
+ */
+export const createQuery = (letters) => {
+    let query = BASE_QUERY;
+    for (let letter of letters.perfect) {
+        query += perfectLetterQ(letter);
     }
-    query = query.slice(0, -4);
-    query += "ORDER BY RANDOM() LIMIT 10;";
+    for (let letter of letters.correct) {
+        query += correctLetterQ(letter);
+    }
+    for (let letter of letters.absent) {
+        query += absentLetterQ(letter);
+    }
+    query = query.slice(0, -4); // quit AND
+    query += QUERY_END;
     return query;
 };
