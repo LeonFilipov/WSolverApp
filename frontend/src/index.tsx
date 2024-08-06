@@ -3,8 +3,8 @@ import { submitWords, createWordObject, eventListenerInputs, resetInput, addWord
 import { letterValidation } from './validation';
 
 // Event listener to use the keyboard without select the field
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Backspace') {
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Backspace') {
     const inputElement = document.querySelectorAll('.letter-input[data-state="filled"]');
     if (inputElement.length > 0){
       const element = inputElement[inputElement.length - 1];
@@ -12,14 +12,14 @@ document.addEventListener('keydown', (e) => {
     }
     return;
   }
-  if (e.key === 'Enter') {
+  if (event.key === 'Enter') {
     submitWords(createWordObject());
     return;
   }
-  if (/^[a-zA-Z]$/.test(e.key)) {
+  if (/^[a-zA-Z]$/.test(event.key)) {
     const inputElement = document.querySelector('.letter-input[data-state="empty"]');
     if (inputElement) {
-      inputElement.textContent = e.key;
+      inputElement.textContent = event.key;
       inputElement.dataset.state = 'filled';
     }
   }
@@ -34,6 +34,7 @@ document.querySelectorAll('.letter-input').forEach((inputElement) => {
 document.querySelector('#submit-button').addEventListener('click', async () => {
   if (letterValidation()) {
     submitWords(createWordObject());
+    return
   }
   // TODO: Show a message to the user plus animations
   console.log('Not all letters are filled');

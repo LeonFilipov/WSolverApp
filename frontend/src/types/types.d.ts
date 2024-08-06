@@ -14,3 +14,19 @@ export type Letters = {
     correct: Letter[];
     absent: AbsentLetter[];
 }
+
+export interface LetterInputProps {
+    id: string,
+    letter: string,
+}
+
+export interface WordleWordProps {
+    wordNumber: number,
+    last: boolean,
+    text: string,
+}
+
+export interface ButtonProps {
+    text: string,
+    handleClick: () => boolean,
+}
