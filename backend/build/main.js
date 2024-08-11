@@ -24,6 +24,7 @@ app.use(cors({
 // API
 app.post("/api", (req, res) => {
     const parsedJSON = lettersSchema.safeParse(req.body); // Recive a JSON with the words
+    console.log(parsedJSON.error);
     if (parsedJSON.success) {
         const letters = parsedJSON.data;
         const query = createQuery(letters);

@@ -11,11 +11,8 @@ export const App = () => {
                 <h1 className="title">Wordle Solver</h1>
             </header>
             <WordleSolver/>
-            <div className="word-display">
-                <div className="column" id="col-1"></div>
-                <div className="column" id="col-2"></div>
-            </div>
         </article>
+        <></>
         </>
     )
 }

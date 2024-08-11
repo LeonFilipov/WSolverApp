@@ -1,0 +1,29 @@
+.response-word {
+    background-color: #1f1d1d;
+    border: none;
+    border-radius: 3px;
+    text-align: center;
+    cursor: pointer;
+    text-transform: uppercase;
+    color: var(--minsk-100);
+    font-weight: 550;
+    transition: transform 0.1s ease-in;
+}
+
+.response-word:hover {
+    transform: scale(1.2);
+}
+
+.response-display {
+    width: 300px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    justify-content: start;
+    align-items: center;
+    background-color: #1f1d1d;
+    border-radius: 3px;
+    border: 2px solid #3d3a3a;
+    padding: 1em;
+    margin: 1em 0 1em;
+}
