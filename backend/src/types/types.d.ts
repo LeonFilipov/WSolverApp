@@ -14,3 +14,7 @@ export type Letters = {
     correct: Letter[];
     absent: AbsentLetter[];
 }
+
+export type WordResponse = {
+    words: Array<{ word: String }>;
+}

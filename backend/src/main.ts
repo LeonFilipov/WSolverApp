@@ -3,7 +3,7 @@ import sqlite3 from "sqlite3"
 import bodyParser from "body-parser"
 import { ACCEPTED_ORIGINS, LOCAL_DB } from "./constants/const.js"
 import { createQuery } from "./dataBaseQuery.js"
-import { Letters } from './types/types.js'
+import { Letters, WordResponse } from './types/types.js'
 import { lettersSchema } from './validation/lettes.js'
 import cors from 'cors'
 
@@ -30,17 +30,17 @@ app.use(cors({
 // API
 app.post("/api", (req, res) => {
     const parsedJSON = lettersSchema.safeParse(req.body); // Recive a JSON with the words
-    console.log(parsedJSON.error);
 
     if (parsedJSON.success) {
         const letters: Letters = parsedJSON.data;
         const query = createQuery(letters);
 
-        db.all(query, (err, rows) => {
+        db.all(query, (err, rows: { word: string}[]) => {
             if (err) {
                 return res.status(500).json({ message: 'Internal server error' }); // Error 500 -> internal server error
             }
-            res.json({ words: rows });
+            const response: WordResponse = { words: rows }; // response typed
+            res.json(response);
         });
     } else {
         return res.status(400).json({ message: 'Bad validation' }); // Error 400 -> bad request
