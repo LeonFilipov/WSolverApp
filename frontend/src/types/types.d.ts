@@ -1,3 +1,4 @@
+import { LetterState } from "../constants/const";
 
 export type Letter = {
     letter: string;
@@ -16,8 +17,9 @@ export type Letters = {
 }
 
 export interface LetterInputProps {
-    id: string,
+    id: number,
     letter: string,
+    onStateChange: (LetterState, number) => void
 }
 
 export interface WordleWordProps {
@@ -29,4 +31,8 @@ export interface WordleWordProps {
 export interface ButtonProps {
     text: string,
     handleClick: () => boolean,
+}
+
+export type WordResponse = {
+    words: Array<{ word: String }>;
 }

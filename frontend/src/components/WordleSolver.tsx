@@ -1,31 +1,17 @@
 import { MouseEvent, MouseEventHandler, useEffect, useRef, useState } from "react";
 import { WordleButton } from "./WordleButton";
 import { WordleWord } from "./WordleWord";
-import { LetterState, PressedKey } from "../constants/const";
-import { ResponseWord } from "./ResponseWord";
+import { API_URL, EMPTY_STRING, LetterState, MAX_WORDS_DISPLAY, PressedKey, REQUEST, WORD_LENGTH } from "../constants/const";
 import './ResponseWord.css'
 import axios from "axios";
 import { ResponseDisplay } from "./ResponseDisplay";
-
-const MAX_WORDS_DISPLAY = 5;
-const WORD_LENGTH = 5;
-const EMPTY_STRING = '';
-const API_URL = 'http://localhost:3000/api';
-const REQUEST = {
-    "perfect": [
-        { "letter": "p", "position": 1}
-    ],
-    "correct": [
-        { "letter": "a", "position": 5}
-    ],
-    "absent": [{ "letter": "m", "position": [4]}]
-}
+import { WordResponse } from "../types/types";
 
 export const WordleSolver = () => {
     const [wordsDisplay, setWords] = useState(1);
     const [input, setInput] = useState(EMPTY_STRING);
+    const [response, setResponse] = useState<WordResponse>({ words: []});
     const handleKeyDownRef = useRef<(event: KeyboardEvent) => void>(()=>{});
-    const [response, setResponse] = useState<string[]>([]);
 
     handleKeyDownRef.current = (event: KeyboardEvent) => {
         if (event.key === PressedKey.BACKSPACE) {
@@ -46,6 +32,7 @@ export const WordleSolver = () => {
         setInput(EMPTY_STRING);
         return true
     }
+
     const handleRemoveWord = () => {
         if (wordsDisplay > 1) {
             setWords(prev => prev - 1);
@@ -68,7 +55,8 @@ export const WordleSolver = () => {
             axios.post(API_URL, REQUEST)
             .then((response) => {
                 // TODO: Handle response -> show in component
-                console.log(response.data);
+                const res: WordResponse = response.data
+                setResponse(res);
             })
             .catch((error) => {
                 // TODO: Handle error -> show in component
@@ -131,7 +119,7 @@ export const WordleSolver = () => {
             <WordleButton text={' + '} handleClick={ handleAddWord }/>
             <WordleButton text={'Get words'} handleClick={ handleSubmit }/>
         </div>
-        <ResponseDisplay words={response} handler={ handleResponseWord }></ResponseDisplay>
+        <ResponseDisplay response={response} handler={ handleResponseWord }></ResponseDisplay>
         </>
     )
 }

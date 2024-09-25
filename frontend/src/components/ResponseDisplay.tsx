@@ -1,19 +1,20 @@
 import { MouseEventHandler } from "react"
 import { ResponseWord } from "./ResponseWord"
+import { WordResponse } from "../types/types"
 
 type ReponseDisplayProps = {
-    words: string[],
+    response: WordResponse,
     handler: MouseEventHandler,
 }
 
-export const ResponseDisplay = ({ words, handler }: ReponseDisplayProps) => {
+export const ResponseDisplay = ({ response, handler }: ReponseDisplayProps) => {
     return (
         <>
-        { words.length > 0 && 
+        { response.words.length > 0 && 
         <main className="response-display">
             {
-                Array.from({ length: words.length}, (_, i) =>{
-                    return <ResponseWord onClick={ handler }> { words[i] } </ResponseWord>
+                Array.from({ length: response.words.length}, (_, i) =>{
+                    return <ResponseWord key={i} onClick={ handler }> { response.words[i].word } </ResponseWord>
                 })
             }
         </main>
